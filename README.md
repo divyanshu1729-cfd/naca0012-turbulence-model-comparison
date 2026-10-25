@@ -18,9 +18,9 @@ The study compares computed aerodynamic coefficients with experimental reference
 |---|---:|
 | Airfoil | NACA 0012 |
 | Mach number | 0.15 |
-| Reynolds number | $2 x 10^6$ |
+| Reynolds number | $2 \times 10^6$ |
 | Reference freestream velocity | Approximately 51 m/s |
-| Kinematic viscosity | $2.55 \times 10^{-5}$\,\mathrm{m^2/s}\) |
+| Kinematic viscosity | $2.55 \times 10^{-5}$\,\$mathrm{m^2/s}$\) |
 | Angle-of-attack range | 0° to approximately 15.16° |
 | Mesh sizes investigated | Approximately 70,000, 125,000 and 300,000 cells |
 
