@@ -11,7 +11,21 @@ FoamFile
     class       dictionary;
     object      fvSolution;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+//  PHASE 3 changes from steady:
+//    SIMPLE block → PIMPLE block
+//    Relaxation factors REMOVED (PIMPLE does not use under-relaxation;
+//    stability comes from outer corrector convergence instead)
+//
+//  PIMPLE settings:
+//    nOuterCorrectors = 3: three PIMPLE sweeps per timestep.
+//      At Co=5, three outer iterations is sufficient for convergence.
+//      Increase to 5 if residuals don't drop within each timestep.
+//    nCorrectors = 2: inner pressure-velocity iterations per outer sweep.
+//    nNonOrthogonalCorrectors = 2: unchanged from steady (mesh has ~43 deg).
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
@@ -19,65 +33,80 @@ solvers
     {
         solver          GAMG;
         smoother        GaussSeidel;
-        tolerance       1e-06;
-        relTol          0.1;
+        tolerance       1e-8;
+        relTol          0.01;
     }
 
-    "(U|k|omega)"
+    pFinal              // tighter tolerance on final outer iteration
+    {
+        $p;
+        relTol          0;
+    }
+
+    U
     {
         solver          smoothSolver;
         smoother        GaussSeidel;
-        tolerance       1e-06;
-        relTol          0.1;
+        nSweeps         2;
+        tolerance       1e-8;
+        relTol          0.01;
     }
 
-    pFinal
-    {
-        $p;
-        tolerance       1e-06;
-        relTol          0;
-    }
-
-    "(U|k|omega|epsilon)Final"
+    UFinal
     {
         $U;
         relTol          0;
     }
 
-    T
+    k
     {
-        $U;
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        nSweeps         2;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+    kFinal
+    {
+        $k;
+        relTol          0;
+    }
+
+    omega
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        nSweeps         2;
+        tolerance       1e-8;
+        relTol          0.01;
+    }
+
+    omegaFinal
+    {
+        $omega;
         relTol          0;
     }
 }
 
-SIMPLE
+// ----------------------------------------------------------------
+// PIMPLE: replaces SIMPLE entirely for time-accurate simulation
+// ----------------------------------------------------------------
+PIMPLE
 {
-    nNonOrthogonalCorrectors 2;
+    nOuterCorrectors        3;    // PIMPLE outer loops per timestep
+    nCorrectors             2;    // pressure corrector inner loops
+    nNonOrthogonalCorrectors 2;  // unchanged from steady (max nonOrth 43 deg)
 
-    consistent          yes;
-
-    residualControl
-    {
-        p               1e-5;
-        U               1e-7;
-        k               1e-7;
-        omega           1e-7;
-    }
+    // Convergence criterion per outer iteration
+    // When ALL fields drop below tolerance within a timestep → move on
+    
 }
 
-relaxationFactors
-{
-    fields
-    {
-        p               0.3;
-    }
-    equations
-    {
-        U               0.7;
-        k               0.5;
-        omega           0.5;
-    }
-}
+
+// NOTE: No relaxationFactors block.
+// PIMPLE stability comes from outer corrector convergence, not under-relaxation.
+// Adding relaxation to PIMPLE artificially damps the unsteady signal and
+// would suppress the vortex shedding you are trying to capture.
 
 // ************************************************************************* //

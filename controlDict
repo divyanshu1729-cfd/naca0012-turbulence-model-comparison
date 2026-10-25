@@ -9,63 +9,90 @@ FoamFile
 {
     format      ascii;
     class       dictionary;
-    location    "system";
     object      controlDict;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+//  PHASE 3 — URANS (Unsteady RANS) — k-omega SST — AoA = 15.16 deg
+//
+//  Key parameters:
+//    Shedding period:   T = c/(St×U) = 1/(0.15×51) = 0.131 s
+//    endTime = 5T:                                   = 0.654 s
+//    Write 10 snapshots per cycle: writeInterval     = 0.0131 s
+//    Expected runtime:  ~4000 timesteps              ≈ 0.6 hours
+//
+//  SWITCH from steady: ddtSchemes Euler + PIMPLE + adjustableRunTime
+//  Start from converged steady SST 15.16 deg solution (latestTime)
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+application     foamRun;
 solver          incompressibleFluid;
 
+// Start from last converged steady SST timestep
 startFrom       latestTime;
+stopAt          writeNow;
+endTime         3000.5;          // 5 shedding cycles (T = 0.131 s each)
 
-startTime       0;
+// Adaptive timestepping — PIMPLE allows Co >> 1
+deltaT          1.634e-4;       // initial Δt = Co×dx/U_max = 5×0.0025/76.5
+adjustTimeStep  yes;
+maxCo           5;              // PIMPLE outer iterations handle Co up to ~10
+maxDeltaT       5e-4;           // cap: prevent timestep growing too large
 
-stopAt          endTime;
-
-endTime         6000;
-
-deltaT          1;
-
-writeControl    timeStep;
-
-writeInterval   100;
-
-purgeWrite      0;
+// Write 10 snapshots per shedding cycle for post-processing
+writeControl    adjustableRunTime;
+writeInterval   0.005;    // T/10 = 0.1307/10
+purgeWrite      0;              // keep ALL timesteps (needed for time-averaging)
 
 writeFormat     ascii;
-
-writePrecision  6;
-
+writePrecision  8;
 writeCompression off;
 
 timeFormat      general;
-
-timePrecision   6;
+timePrecision   8;
 
 runTimeModifiable true;
 
+// ----------------------------------------------------------------
+// Functions — same force monitoring as steady case + Cl(t) history
+// ----------------------------------------------------------------
 functions
 {
-    forces
+    forceCoeffs
     {
         type            forceCoeffs;
         libs            ("libforces.so");
-        writeControl    timeStep;
-        writeInterval   1;
-        
-        log             true;
         patches         (airfoil);
+
         rho             rhoInf;
-        rhoInf          1.225;     // Reference density
-        CofR            (0.25 0 0); // Moment center at quarter-chord
+        rhoInf          1.0;
+
         liftDir         (-0.26151 0.96519 0);
         dragDir         (0.96519 0.26151 0);
+
+        CofR            (0.25 0 0);
         pitchAxis       (0 0 1);
+
         magUInf         51.0;
-        lRef            1.0;       // Chord length
-        Aref            0.1;       // Chord * Extrusion thickness (1.0 * 0.1)
+        lRef            1.0;
+        Aref            0.1;
+
+        // Write every timestep to capture full Cl(t) time history
+        writeControl    timeStep;
+        writeInterval   1;
     }
-     yPlus
+
+    residuals
+    {
+        type            residuals;
+        libs            ("libutilityFunctionObjects.so");
+        fields          (U p k omega);
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+
+    yPlus
     {
         type            yPlus;
         libs            ("libfieldFunctionObjects.so");

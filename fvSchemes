@@ -12,10 +12,24 @@ FoamFile
     object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+//  PHASE 3 changes from steady:
+//    1. ddtSchemes: steadyState → Euler   (1st-order implicit time integration)
+//       Euler is unconditionally stable, appropriate for URANS startup.
+//       Switch to 'backward' (2nd-order) after first stable cycle if desired.
+//
+//    2. divSchemes: remove 'bounded' keyword.
+//       'bounded' is a SIMPLE-specific stabilisation that modifies the
+//       divergence operator. It is inappropriate for time-accurate PIMPLE.
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 ddtSchemes
 {
-    default         steadyState;
+    // Euler: 1st-order implicit — unconditionally stable, starts cleanly
+    // from the steady solution. Switch to 'backward' for 2nd-order accuracy
+    // once periodicity is established (after ~1 shedding cycle).
+    default         Euler;
 }
 
 gradSchemes
@@ -24,7 +38,7 @@ gradSchemes
 
     limited         cellLimited Gauss linear 1;
     grad(U)         $limited;
-    grad(k)         $limited;     // FIX: was missing — fell back to unlimited
+    grad(k)         $limited;
     grad(omega)     $limited;
 }
 
@@ -32,10 +46,10 @@ divSchemes
 {
     default         none;
 
-    div(phi,U)      bounded Gauss linearUpwind grad(U);
-
-    div(phi,k)      bounded Gauss upwind;
-    div(phi,omega)  bounded Gauss upwind;
+    // Removed 'bounded' — not appropriate for time-accurate PIMPLE
+    div(phi,U)      Gauss linearUpwind grad(U);
+    div(phi,k)      Gauss linearUpwind grad(k);
+    div(phi,omega)  Gauss linearUpwind grad(omega);
 
     div((nuEff*dev2(T(grad(U))))) Gauss linear;
 }
@@ -45,14 +59,14 @@ laplacianSchemes
     default         Gauss linear corrected;
 }
 
-snGradSchemes
-{
-    default         corrected;
-}
-
 interpolationSchemes
 {
     default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
 }
 
 wallDist
