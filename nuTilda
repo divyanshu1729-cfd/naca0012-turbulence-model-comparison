@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volScalarField;
+    object      nuTilda;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -1 0 0 0 0];
+
+internalField   uniform 7.65e-5;
+
+boundaryField
+{
+    inlet
+    {
+        type            fixedValue;
+        value           uniform 7.65e-05;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    top
+    {
+        type            freestream;
+        freestreamValue uniform 7.65e-05;
+    }
+
+    bottom
+    {
+        type            freestream;
+        freestreamValue uniform 7.65e-05;
+    }
+
+    airfoil
+    {
+        type            fixedValue; // Explicit zero condition for low-Re wall-resolved grids
+        value           uniform 0;
+    }
+
+    frontAndBack
+    {
+        type            empty; // Confirms 2D invariant planar constraint
+    }
+}
+
+// ************************************************************************* //
