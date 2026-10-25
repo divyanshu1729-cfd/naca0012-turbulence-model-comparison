@@ -11,64 +11,63 @@ FoamFile
     class       dictionary;
     object      fvSolution;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solvers
 {
     p
     {
-        // GAMG: algebraic multigrid — optimal for pressure in RANS
         solver          GAMG;
         smoother        GaussSeidel;
-        nPreSweeps      0;
-        nPostSweeps     2;
-        cacheAgglomeration true;
-        nCellsInCoarsestLevel 10;
-        agglomerator    faceAreaPair;
-        mergeLevels     1;
-        tolerance       1e-7;
-        relTol          0.01;
+        tolerance       1e-06;
+        relTol          0.1;
     }
 
-    U
+    "(U|k|omega)"
     {
         solver          smoothSolver;
         smoother        GaussSeidel;
-        nSweeps         2;
-        tolerance       1e-8;
-        relTol          0.01;
+        tolerance       1e-06;
+        relTol          0.1;
     }
 
-    nuTilda
+    pFinal
     {
-        solver          smoothSolver;
-        smoother        GaussSeidel;
-        nSweeps         2;
-        tolerance       1e-8;
-        relTol          0.01;
+        $p;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    "(U|k|omega|epsilon)Final"
+    {
+        $U;
+        relTol          0;
+    }
+
+    T
+    {
+        $U;
+        relTol          0;
     }
 }
 
 SIMPLE
 {
-    // Bug fix: was 0 in tutorial → non-orthogonality error uncorrected
-    // snappy mesh max non-orth will be ~50-60 deg → need 2 correctors
     nNonOrthogonalCorrectors 2;
 
-    // Consistent SIMPLE (SIMPLEC): better convergence for external aero
     consistent          yes;
 
     residualControl
     {
         p               1e-5;
         U               1e-7;
-        nuTilda         1e-7;
+        k               1e-7;
+        omega           1e-7;
     }
 }
 
 relaxationFactors
 {
-    // Standard values for external RANS aerodynamics
     fields
     {
         p               0.3;
@@ -76,7 +75,8 @@ relaxationFactors
     equations
     {
         U               0.7;
-        nuTilda         0.7;
+        k               0.5;
+        omega           0.5;
     }
 }
 

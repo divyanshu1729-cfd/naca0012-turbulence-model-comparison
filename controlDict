@@ -16,13 +16,13 @@ FoamFile
 
 solver          incompressibleFluid;
 
-startFrom       startTime;
+startFrom       latestTime;
 
 startTime       0;
 
 stopAt          endTime;
 
-endTime         3000;
+endTime         6000;
 
 deltaT          1;
 
@@ -58,8 +58,8 @@ functions
         rho             rhoInf;
         rhoInf          1.225;     // Reference density
         CofR            (0.25 0 0); // Moment center at quarter-chord
-        dragDir         (0.9652 0.2615 0);
-        liftDir         (-0.2615 0.9652 0);  
+        liftDir         (-0.26151 0.96519 0);
+        dragDir         (0.96519 0.26151 0);
         pitchAxis       (0 0 1);
         magUInf         51.0;
         lRef            1.0;       // Chord length
