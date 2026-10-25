@@ -3,7 +3,7 @@ OpenFOAM study comparing Spalart–Allmaras and k-omega SST turbulence models fo
 
 **Status:** Undergraduate CFD study; results and interpretations require continued review  
 **Solver:** OpenFOAM Foundation v13  
-**Models:** Spalart–Allmaras (SA) and $k$--$omega$ SST  
+**Models:** Spalart–Allmaras (SA) and $k$--$\omega$ SST  
 **Reference data:** Ladson, NASA Technical Memorandum 4074
 
 ## Overview
