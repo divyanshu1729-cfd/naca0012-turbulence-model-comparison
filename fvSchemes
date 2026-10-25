@@ -1,0 +1,71 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         steadyState;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+
+    // Cell-limited gradient for U — prevents unbounded gradients
+    // in regions of rapid change (near LE/TE). Limiter factor 1 = full limiting.
+    grad(U)         cellLimited Gauss linear 1;
+
+    // Same limiting for nuTilda — important for SA stability
+    grad(nuTilda)   cellLimited Gauss linear 1;
+}
+
+divSchemes
+{
+    default         none;
+
+    // Bounded upwind for momentum — stable for RANS, 2nd order accuracy
+    // via linearUpwind (uses gradient to reconstruct face values)
+    div(phi,U)      bounded Gauss linearUpwind grad(U);
+
+    // SA transport equation: upwind for stability near wall
+    div(phi,nuTilda) bounded Gauss linearUpwind grad(nuTilda);
+
+    // Viscous stress divergence (SA model specific term)
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
+}
+
+laplacianSchemes
+{
+    // corrected: non-orthogonality correction applied
+    // (required since snappy mesh has some non-orthogonality)
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+wallDist
+{
+    // meshWave: fast wall distance calculation required by SA model
+    method          meshWave;
+}
+
+// ************************************************************************* //
