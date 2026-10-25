@@ -8,7 +8,7 @@ OpenFOAM study comparing Spalart–Allmaras and k-omega SST turbulence models fo
 
 ## Overview
 
-This project investigates the aerodynamic predictions of two Reynolds-averaged Navier–Stokes (RANS) turbulence models for a NACA 0012 airfoil: Spalart–Allmaras and \(k\text{–}\omega\) SST.
+This project investigates the aerodynamic predictions of two Reynolds-averaged Navier–Stokes (RANS) turbulence models for a NACA 0012 airfoil: Spalart–Allmaras and $k$--$\omega$ SST.
 
 The study compares computed aerodynamic coefficients with experimental reference data and examines sensitivity to mesh resolution and angle of attack. A short transient investigation using SST-SAS was also conducted to examine whether the computed flow exhibited repeatable unsteady behaviour.
 
