@@ -1,0 +1,70 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       volScalarField;
+    object      omega;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//
+//  ω freestream = 727 s⁻¹
+//  Derived from: νt = k/ω = 3.9e-3/727 = 5.37e-6 m²/s → νt/ν = 0.21 ✓
+//  Consistent with SA freestream (nuTilda=3ν → νt/ν=0.21)
+//
+//  Wall BC: omegaWallFunction
+//    OpenFOAM's omegaWallFunction automatically blends between:
+//      - Viscous sublayer (y+ < 5):  ω = 60ν/(β₁·y₁²)
+//      - Log layer       (y+ > 30):  ω = u_τ/(Cμ^0.25·κ·y)
+//    With y+ ≈ 0.58 average, the viscous formula applies:
+//      ω_wall = 60×2.55e-5/(0.075×(1.24e-5)²) = 1.33e8 s⁻¹
+//    The wall function handles this internally — do not set manually.
+//
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 -1 0 0 0 0];
+
+internalField   uniform 727;
+
+boundaryField
+{
+    inlet
+    {
+        type            freestream;
+        freestreamValue uniform 727;
+    }
+    outlet
+    {
+        type            freestream;
+        freestreamValue uniform 727;
+    }
+    top
+    {
+        type            freestream;
+        freestreamValue uniform 727;
+    }
+    bottom
+    {
+        type            freestream;
+        freestreamValue uniform 727;
+    }
+
+    airfoil
+    {
+        // Blended viscous/log-layer wall function — correct for y+<1
+        type            omegaWallFunction;
+        value           uniform 727;
+    }
+
+    frontAndBack
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
