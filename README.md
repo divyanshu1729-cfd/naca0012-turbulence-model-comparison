@@ -3,7 +3,7 @@ OpenFOAM study comparing Spalart–Allmaras and k-omega SST turbulence models fo
 
 **Status:** Undergraduate CFD study; results and interpretations require continued review  
 **Solver:** OpenFOAM Foundation v13  
-**Models:** Spalart–Allmaras (SA) and \(k\text{–}\omega\) SST  
+**Models:** Spalart–Allmaras (SA) and $k$--$\omega$ SST  
 **Reference data:** Ladson, NASA Technical Memorandum 4074
 
 ## Overview
@@ -30,7 +30,7 @@ These values describe the documented numerical setup and should be checked again
 
 The reported workflow includes:
 
-- Steady RANS calculations using the Spalart–Allmaras and \(k\text{–}\omega\) SST models.
+- Steady RANS calculations using the Spalart–Allmaras and $k$--$\omega$ SST models.
 - Comparison of lift and drag predictions across the investigated angles of attack.
 - Mesh-resolution and near-wall-resolution assessment.
 - Comparison with the experimental NACA 0012 data documented by Ladson in NASA TM-4074.
@@ -52,12 +52,6 @@ All numerical findings remain subject to review of the underlying data, plots, s
 
 This repository is intended to contain:
 - OpenFOAM dictionaries, mesh-generation files, and post-processing scripts.
-
-## Reproducibility Status
-
-The report and source document should be distinguished from the original simulation inputs. Any case files added later must be identified accurately as recovered originals or reconstructed files.
-
-Until the required dictionaries, mesh-generation procedure, boundary conditions, solver settings, and post-processing steps are available, this repository should be treated as documentation of the study rather than a complete, independently runnable CFD case.
 
 ## Limitations
 
