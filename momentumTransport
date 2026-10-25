@@ -11,42 +11,18 @@ FoamFile
     class       dictionary;
     object      momentumTransport;
 }
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-//
-//  Phase 1: Spalart-Allmaras (SA) one-equation RANS model
-//
-//  For k-omega SST (Phase 2), replace:
-//    model  SpalartAllmaras   →   kOmegaSST
-//  and add 0/k, 0/omega fields.
-//
-//  SA model notes:
-//    - Designed for attached aerospace flows
-//    - Wall-resolved formulation (y+ < 1): fixedValue 0 at wall for nuTilda
-//    - Standard Cb1, Cb2, Cv1, Cw1, Cw2, Cw3, sigma coefficients retained
-//
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 simulationType  RAS;
 
 RAS
 {
-    model           SpalartAllmaras;
+    model           kOmegaSST;
 
     turbulence      on;
+    
     printCoeffs     on;
 
-    // Standard SA coefficients (do NOT modify for validation study)
-    SpalartAllmarasCoeffs
-    {
-        Cb1         0.1355;
-        Cb2         0.622;
-        Cw2         0.3;
-        Cw3         2;
-        Cv1         7.1;
-        Cs          0.3;
-        sigmaNut    0.66666;
-        kappa       0.4187;
-    }
 }
 
 // ************************************************************************* //

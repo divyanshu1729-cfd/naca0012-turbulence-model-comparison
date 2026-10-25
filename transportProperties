@@ -12,20 +12,6 @@ FoamFile
     object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-//
-//  Kinematic viscosity matched to Ladson NASA TM-4074 test conditions:
-//
-//    U_inf = M × a = 0.15 × 340 = 51 m/s
-//    c     = 1.0 m  (chord)
-//    Re    = U_inf × c / nu = 2.00 × 10^6
-//    nu    = 51 / 2e6 = 2.55 × 10^-5 m^2/s
-//
-//  Note: nu = 2.55e-5 corresponds to ~120 °C air, physically realised
-//  in the Langley low-turbulence pressure tunnel by varying stagnation
-//  pressure rather than temperature.  For incompressible CFD only Re
-//  enters the RANS equations, so this is the correct setting.
-//
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 viscosityModel  constant;
 
